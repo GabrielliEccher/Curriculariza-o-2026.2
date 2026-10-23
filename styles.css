@@ -444,6 +444,24 @@ h1, h2, p { margin-top: 0; }
   .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
 }
 
+@media (min-width: 1200px) and (min-height: 800px) {
+  .play-area,
+  .play-area--letter-image {
+    width: min(800px, calc(100vw - 120px)) !important;
+  }
+  .play-area--letter-image .identify-target {
+    min-height: 92px !important;
+    font-size: 88px !important;
+  }
+  .play-area--letter-image .option.option-illustration-only {
+    width: 142px !important;
+  }
+  .play-area--letter-image .option.option-illustration-only .option-art {
+    width: 142px !important;
+    height: 142px !important;
+  }
+}
+
 /* Último ajuste: quatro alternativas de imagem na mesma linha. */
 .play-area--image-choice .identify-options.option-grid--images-only {
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
@@ -462,6 +480,27 @@ h1, h2, p { margin-top: 0; }
   .play-area--image-choice .option.option-illustration-only {
     width: 100% !important;
     max-width: 128px !important;
+  }
+}
+
+/* Escala exclusiva para monitores grandes; as regras do Chromebook permanecem intactas. */
+@media (min-width: 1200px) and (min-height: 800px) {
+  .play-area {
+    width: min(800px, calc(100vw - 120px));
+  }
+  .play-area--letter-image {
+    width: min(800px, calc(100vw - 120px));
+  }
+  .play-area--letter-image .identify-target {
+    min-height: 92px;
+    font-size: 88px;
+  }
+  .play-area--letter-image .option.option-illustration-only {
+    width: 142px !important;
+  }
+  .play-area--letter-image .option.option-illustration-only .option-art {
+    width: 142px !important;
+    height: 142px !important;
   }
 }
 
