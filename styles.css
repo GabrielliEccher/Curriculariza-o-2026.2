@@ -157,6 +157,61 @@ h1, h2, p { margin-top: 0; }
 .hotspot-pedra { top: 61%; right: 15%; }
 .hotspot-tesouro { bottom: 8%; left: 37%; }
 .hotspot-casa { top: 54%; left: 14%; }
+.treasure-star,
+.treasure-stone {
+  position: absolute;
+  top: 61%;
+  left: 59%;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.treasure-star { pointer-events: none; }
+.treasure-star { z-index: 1; }
+.treasure-stone {
+  top: calc(61% - 9px);
+  left: calc(59% - 9px);
+  width: 72px;
+  height: 72px;
+  z-index: 2;
+  cursor: pointer;
+}
+.treasure-stone:hover, .treasure-stone:focus-visible {
+  background: transparent;
+  outline: 0;
+  transform: scale(1.08);
+}
+.treasure-stone--vanishing {
+  pointer-events: none;
+  animation: treasure-stone-disappear .65s ease-in forwards;
+}
+@keyframes treasure-stone-disappear {
+  0% { opacity: 1; transform: scale(1) rotate(0); }
+  100% { opacity: 0; transform: scale(.35) rotate(-16deg); }
+}
+.treasure-star .illustration,
+.treasure-star .illustration img,
+.treasure-stone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.play-area:has(.treasure-scene) {
+  overflow: hidden !important;
+}
+.play-area:has(.treasure-scene) .treasure-scene {
+  width: min(100%, 300px);
+  max-width: 300px;
+  max-height: 300px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
 .sum-equation { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; font-size: clamp(25px, 3vw, 46px); }
 .sum-equation > span { display: flex; flex-wrap: wrap; justify-content: center; max-width: min(100%, 460px); }
 .sum-equation b { color: var(--orange); }
@@ -388,10 +443,113 @@ h1, h2, p { margin-top: 0; }
   .play-area { width: min(939px, calc(100vw - 80px)); aspect-ratio: 939 / 529; }
   .play-area--letter-image { width: min(939px, calc(100vw - 80px)); }
 }
+
+/* Último ajuste: quatro alternativas de imagem na mesma linha. */
+.play-area--image-choice .identify-options.option-grid--images-only {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  column-gap: clamp(0px, 1vw, 10px) !important;
+  row-gap: 0 !important;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 150px) !important;
+  max-width: 150px !important;
+}
+@media (max-width: 520px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: 8px !important;
+  }
+  .play-area--image-choice .option.option-illustration-only {
+    width: 100% !important;
+    max-width: 128px !important;
+  }
+}
+
+/* As alternativas de imagens devem ocupar uma única linha dentro do cartão. */
+.play-area--image-choice .identify-options.option-grid--images-only {
+  width: min(100%, 900px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 24px);
+  align-items: center;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 176px);
+  max-width: 176px;
+  justify-self: center;
+}
+.play-area--image-choice .option.option-illustration-only .option-art {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+@media (max-width: 800px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .play-area--image-choice .option.option-illustration-only { max-width: 128px; }
+}
+@media (max-width: 520px) {
+  .play-area--image-choice .identify-options.option-grid--images-only {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 8px;
+  }
+}
+
+/* Mantém cada letra e sua imagem na mesma linha vertical. */
+.play-area:has(.link-board) .link-column { gap: 4px; }
+.play-area:has(.link-board) .link-item.link-letter,
+.play-area:has(.link-board) .link-item.link-image {
+  height: 76px;
+  min-height: 76px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.play-area:has(.link-board) .link-item.link-image .illustration img {
+  width: 72px;
+  height: 72px;
+}
+.play-area:has(.sum-equation) .activity-content {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding-block: clamp(18px, 4vh, 36px);
+}
+.play-area:has(.compare) {
+  padding-bottom: clamp(42px, 6vh, 72px) !important;
+}
+.play-area:has(.compare) .activity-content {
+  padding-bottom: clamp(18px, 3vh, 34px);
+}
+.play-area--image-choice .identify-options.option-grid--images-only {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  column-gap: clamp(0px, 1vw, 10px) !important;
+  row-gap: 0 !important;
+}
+.play-area--image-choice .option.option-illustration-only {
+  width: min(100%, 150px);
+  max-width: 150px;
+}
+@media (max-width: 520px) {
+  .play-area:has(.link-board) .link-item.link-letter,
+  .play-area:has(.link-board) .link-item.link-image {
+    height: 62px;
+    min-height: 62px;
+  }
+  .play-area:has(.link-board) .link-item.link-image .illustration img {
+    width: 58px;
+    height: 58px;
+  }
+}
+.play-area--sound-animal .identify-options .option-card .option-art { flex-basis: 124px !important; height: 124px !important; padding: 8px !important; overflow: visible !important; }
+.play-area--sound-animal .identify-options .option-card .option-art .illustration,
+.play-area--sound-animal .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; overflow: visible; }
 .play-area:has(.missing-word) .missing-slot { width: 2.5em; min-width: 2.5em; height: 1.2em; }
 .play-area:has(.identify-options) { padding-bottom: clamp(28px, 3.5vh, 40px); }
 .play-area:has(.identify-options) .identify-options { margin-bottom: 8px; }
 .play-area:has(.count-items) .activity-content { justify-content: center; padding-block: clamp(18px, 4vh, 36px); gap: clamp(10px, 2vh, 18px); }
+.play-area:has(.count-items) .count-progress { display: none !important; }
+.play-area:has(.count-items) .count-item.selected::after { content: none !important; display: none !important; }
 .play-area:has(.add-equation) .activity-content,
 .play-area:has(.compare) .activity-content,
 .play-area:has(.pattern-sequence-display) .activity-content,
@@ -435,6 +593,9 @@ h1, h2, p { margin-top: 0; }
 .play-area--star-match .identify-options .option-card { min-height: 120px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .play-area--star-match .identify-options .option-card .option-art { flex-basis: 120px; height: 120px; overflow: visible; }
 .play-area--star-match .identify-options .option-card .option-caption { display: none !important; }
+.play-area--star-match .identify-options .option-card .option-art { flex-basis: 160px !important; width: 160px; height: 160px !important; overflow: visible !important; padding: 8px; box-sizing: border-box; }
+.play-area--star-match .identify-options .option-card .option-art .illustration,
+.play-area--star-match .identify-options .option-card .option-art .illustration img { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; object-fit: contain !important; }
 @media (max-width: 520px) {
   .play-area--letter-image { width: calc(100vw - 24px); padding-bottom: 48px; }
   .play-area--letter-image .identify-target { width: auto; min-height: 40px; font-size: 30px; }

@@ -45,13 +45,12 @@
 
   function renderHome() {
     clearTimeout(memoryTimer);
-    app.innerHTML = `<section class="screen home"><div class="home-panel"><img class="brand-logo" src="imagens/logo.jpg" alt="Trilha Mágica"><h1>Aprender é uma <span>trilha</span> de descobertas!</h1><label class="name-label" for="player-name">Como você se chama?</label><input id="player-name" class="name-input" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome"><div class="home-actions"><button class="comic-button" type="button" data-action="levels">COMEÇAR</button><button class="voice-button" type="button" data-action="welcome">🔊 Ouvir o convite</button></div></div></section>`;
+    app.innerHTML = `<section class="screen home"><div class="home-panel"><img class="brand-logo" src="imagens/logo.jpg" alt="Trilha Mágica"><h1>Aprender é uma <span>trilha</span> de descobertas!</h1><label class="name-label" for="player-name">Como você se chama?</label><input id="player-name" class="name-input" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome"><div class="home-actions"><button class="comic-button" type="button" data-action="levels">COMEÇAR</button></div></div></section>`;
     const nameInput=app.querySelector("#player-name");
     nameInput.value=playerName;
     nameInput.addEventListener("input",()=>{playerName=nameInput.value.trim().slice(0,24);});
     addSoundToggle();
     app.querySelector('[data-action="levels"]').addEventListener("click",()=>{playerName=nameInput.value.trim().slice(0,24);renderLevels();});
-    app.querySelector('[data-action="welcome"]').addEventListener("click",()=>playVoiceFile("audio/boas-vindas.mp3"));
   }
   function renderLevels() {
     clearTimeout(memoryTimer);
@@ -149,7 +148,7 @@
   /** Desenha o tipo de interação definido para a pergunta atual. */
   function renderMode(q) {
     switch(q.mode) {
-      case "syllables": { const shown=game.selectedParts.map(i=>q.options[i]).join(" · ");return `<div class="visual">${illustrated(q.icon)}</div><div class="syllable-answer">${shown||"Toque nas sílabas abaixo"}</div><div class="option-grid">${q.options.map((x,i)=>{const selected=game.selectedParts.includes(i);return `<button type="button" class="option ${selected?"active":""}" data-token="${i}" aria-pressed="${selected}" ${game.locked||(!selected&&game.selectedParts.length>=q.parts)?"disabled":""}>${x}</button>`;}).join("")}</div><button class="check-button" data-action="check-syllables" ${game.locked||game.selectedParts.length!==q.parts?"disabled":""}>Conferir</button>`; }
+      case "syllables": { const shown=game.selectedParts.map(i=>q.options[i]).join(" · ");return `<div class="visual">${illustrated(q.icon)}</div><div class="syllable-answer">${shown||"Toque nas sílabas abaixo"}</div><div class="option-grid">${q.options.map((x,i)=>{const selected=game.selectedParts.includes(i);return `<button type="button" class="option ${selected?"active":""}" data-token="${i}" aria-pressed="${selected}" ${game.locked||(!selected&&game.selectedParts.length>=q.parts)?"disabled":""}>${x}</button>`;}).join("")}</div><button class="check-button" data-action="check-syllables" ${game.locked?"disabled":""}>Conferir</button>`; }
       case "word-parts": { const shown=game.selectedWordParts.join(" · ");return `<div class="visual">${illustrated(q.icon)}</div><div class="word-display">SOR <span>${game.selectedWordParts[0]||"＿"}</span> <span>${game.selectedWordParts[1]||"＿"}</span></div><p class="count-progress">${shown||"Escolha as sílabas na ordem"}</p><div class="option-grid word-parts-options">${q.options.map(x=>{const selected=game.selectedWordParts.includes(x);return `<button type="button" class="option ${selected?"active":""}" data-word-part="${escapeHtml(x)}" aria-pressed="${selected}" ${game.locked||(!selected&&game.selectedWordParts.length>=q.slots)?"disabled":""}>${escapeHtml(x)}</button>`;}).join("")}</div><button class="check-button" data-action="check-word-parts" ${game.locked||game.selectedWordParts.length!==q.slots?"disabled":""}>Conferir</button>`; }
       case "identify": { const repeatedText=typeof q.target==="string"&&q.target.trim().toLocaleUpperCase("pt-BR")===String(q.prompt).trim().toLocaleUpperCase("pt-BR");return `${repeatedText?"":`<div class="visual identify-target">${illustrated(q.target)}</div>`}${optionButtons(q.options,"identify-options",Boolean(q.imageOnly))}`; }
       case "count": return `<div class="count-request"><div class="guide-portrait">${illustrated(q.guide)}</div><strong>“${escapeHtml(q.prompt)}”</strong></div><p class="count-progress">Selecionadas: ${game.countSelected.length} / ${q.target} · Você pode marcar e desmarcar.</p><div class="count-items">${Array.from({length:q.pool},(_,i)=>{const selected=game.countSelected.includes(i);return `<button type="button" class="count-item ${selected?"selected":""}" data-count-item="${i}" aria-label="Maçã ${i+1}${selected?", selecionada. Toque para desmarcar":""}" aria-pressed="${selected}" ${game.locked?"disabled":""}>${illustrated(q.icon)}</button>`;}).join("")}</div><button class="check-button" data-action="check-count" ${game.countSelected.length===0||game.locked?"disabled":""}>Conferir quantidade</button>`;
@@ -169,7 +168,7 @@
       case "direction": return `<div class="visual direction-route">${illustrated(`${q.character} → ${q.destination}`)}</div>${optionButtons(q.options)}`;
       case "maze": { const path=mazePath(q);return `<div class="maze-board" role="grid" aria-label="Labirinto: siga os quadrados marrons até a casa">${Array.from({length:q.rows*q.columns},(_,index)=>{const r=Math.floor(index/q.columns),c=index%q.columns,isStart=r===q.start[0]&&c===q.start[1],isGoal=r===q.goal[0]&&c===q.goal[1],isPath=path.some(([pr,pc])=>pr===r&&pc===c),isPlayer=game.mazePosition?.[0]===r&&game.mazePosition?.[1]===c;return `<div class="maze-cell ${isPath?"is-path":"is-grass"} ${isGoal?"is-goal":""}" role="gridcell" aria-label="${isPlayer?"Personagem":isGoal?"Casa":isStart?"Início":isPath?"Caminho":"Gramado: não é possível passar"}">${isPlayer?illustrated("👦"):isGoal?illustrated("🏠"):""}</div>`;}).join("")}</div><div class="maze-controls" role="group" aria-label="Setas para mover o personagem"><span aria-hidden="true"></span><button type="button" data-maze-direction="⬆️" aria-label="Mover para cima">${illustrated("⬆️")}</button><span aria-hidden="true"></span><button type="button" data-maze-direction="⬅️" aria-label="Mover para a esquerda">${illustrated("⬅️")}</button><span aria-hidden="true"></span><button type="button" data-maze-direction="➡️" aria-label="Mover para a direita">${illustrated("➡️")}</button><span aria-hidden="true"></span><button type="button" data-maze-direction="⬇️" aria-label="Mover para baixo">${illustrated("⬇️")}</button><span aria-hidden="true"></span></div>`; }
       case "drag": return `<div class="drag-board"><div class="route-display">${illustrated(q.route)}</div><button type="button" class="drag-character" aria-label="Arraste o personagem">${illustrated(q.character)}</button><p class="drag-help">Arraste o personagem ou toque no destino:</p><div class="drop-zones">${q.options.map(x=>`<button type="button" class="drop-zone" data-drop="${escapeHtml(x)}" ${game.locked?"disabled":""}>${escapeHtml(x)}</button>`).join("")}</div></div>`;
-      case "treasure": return `<div class="treasure-scene" role="group" aria-label="Escolha um lugar na cena para procurar o tesouro"><img src="imagens/quizTesouro.png" alt="Desenho de uma casa, um caminho e uma árvore">${q.cells.map(c=>{const revealed=c.pos==="pedra"&&game.treasureRevealed;return `<button type="button" class="treasure-hotspot hotspot-${escapeHtml(c.pos)} ${revealed?"revealed":""}" data-position="${escapeHtml(c.pos)}" aria-label="${revealed?"Tesouro encontrado":`Escolher ${escapeHtml(artNames[art[c.icon]]||c.pos)}`}" ${game.locked?"disabled":""}>${revealed?illustrated("⭐"):illustrated(c.icon)}</button>`;}).join("")}</div>`;
+      case "treasure": { const revealed=Boolean(game.treasureRevealed); return `<div class="treasure-scene" role="group" aria-label="Cena do tesouro"><img src="imagens/quizTesouro.png" alt="Desenho de uma casa, um caminho e uma árvore"><span class="treasure-star" aria-hidden="true">${illustrated("⭐")}</span>${revealed?"":`<button type="button" class="treasure-stone" data-position="pedra" aria-label="Pedra que esconde o tesouro" ${game.locked?"disabled":""}><img src="imagens/pedra.png" alt=""></button>`}</div>`; }
       case "link": { const right=q.pairs.map(p=>p[1]).slice().reverse();return `<div class="link-board" data-link-board><svg class="link-lines" aria-hidden="true"></svg><div class="link-column"><strong>${escapeHtml(q.leftLabel||"Letras")}</strong>${q.pairs.map(([word])=>`<button type="button" class="link-item link-letter ${game.linked.includes(word)?"matched":""} ${game.selectedLeft===word?"active":""}" data-link="left" data-key="${escapeHtml(word)}" ${game.locked||game.linked.includes(word)?"disabled":""}>${escapeHtml(word)}</button>`).join("")}</div><div class="link-column link-images"><strong>${escapeHtml(q.rightLabel||"Imagens")}</strong>${right.map(icon=>`<button type="button" class="link-item link-image ${game.linked.includes(q.pairs.find(p=>p[1]===icon)?.[0])?"matched":""}" data-link="right" data-key="${escapeHtml(icon)}" aria-label="${escapeHtml(artNames[art[icon]]||icon)}" ${game.locked||game.linked.includes(q.pairs.find(p=>p[1]===icon)?.[0])?"disabled":""}>${illustrated(icon)}</button>`).join("")}</div></div><p class="link-help">${game.linked.length} de ${q.pairs.length} pares encontrados</p>`; }
       case "memory": return `<div class="visual memory-symbol" id="memory-symbol">${illustrated(q.memory)}</div><p class="memory-hint" id="memory-hint">Memorize!</p><div class="memory-options" id="memory-options" hidden>${optionButtons(q.options)}</div>`;
       case "scene-find": return `<div class="find-scene" role="group" aria-label="Cena com uma mesa e objetos para encontrar"><div class="find-sky" aria-hidden="true">☀️　☁️</div><div class="find-table" aria-hidden="true"><span></span><i></i><i></i></div><button class="scene-object scene-apple" data-value="apple" aria-label="Maçã vermelha em cima da mesa">${illustrated("🍎")}<small>em cima da mesa</small></button><button class="scene-object scene-ball" data-value="ball" aria-label="Bola azul embaixo da mesa">${illustrated("🔵")}<small>embaixo da mesa</small></button><button class="scene-object scene-car" data-value="car" aria-label="Carrinho amarelo ao lado da mesa">${illustrated("🚗")}<small>ao lado da mesa</small></button></div>`;
@@ -184,7 +183,7 @@
     addSoundToggle();app.querySelector('[data-action="back"]').addEventListener("click",renderLevels);app.querySelector('[data-action="speak"]').addEventListener("click",()=>{speakQuestion(q);playSound("tap");});
     app.querySelectorAll("[data-value]").forEach(b=>b.addEventListener("click",()=>q.mode==="missing"?chooseMissingSyllable(b.dataset.value,b):submitAnswer(b.dataset.value)));
     app.querySelectorAll("[data-maze-direction]").forEach(b=>b.addEventListener("click",()=>moveInMaze(b.dataset.mazeDirection)));
-    app.querySelectorAll("[data-position]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.position)));
+    app.querySelectorAll("[data-position]").forEach(b=>b.addEventListener("click",()=>q.mode==="treasure"?revealTreasure(b):submitAnswer(b.dataset.position)));
     app.querySelectorAll("[data-token]").forEach(b=>b.addEventListener("click",()=>{const index=Number(b.dataset.token),selected=game.selectedParts.includes(index);if(selected){game.selectedParts=game.selectedParts.filter((part)=>part!==index);stopSpeech();}else if(game.selectedParts.length<q.parts)game.selectedParts.push(index);if(!selected){const parts=game.selectedParts.map(i=>q.options[i]);const formed=parts.length===q.parts?parts.join(""):"";speakSyllableSelection(parts,formed);}renderGame();}));
     app.querySelectorAll("[data-word-part]").forEach(b=>b.addEventListener("click",()=>{const syllable=b.dataset.wordPart,selected=game.selectedWordParts.includes(syllable);if(selected){game.selectedWordParts=game.selectedWordParts.filter((part)=>part!==syllable);stopSpeech();}else if(game.selectedWordParts.length<q.slots)game.selectedWordParts.push(syllable);if(!selected){const formed=game.selectedWordParts.length===q.slots?`SOR${game.selectedWordParts.join("")}`:"";speakSyllableSelection(game.selectedWordParts,formed);}renderGame();}));
     app.querySelectorAll("[data-count-item]").forEach(b=>b.addEventListener("click",()=>{const i=Number(b.dataset.countItem);game.countSelected=game.countSelected.includes(i)?game.countSelected.filter(x=>x!==i):[...game.countSelected,i];renderGame();}));
@@ -201,7 +200,7 @@
       b.addEventListener("click",()=>handleLink(b.dataset.link,b.dataset.key));
       b.addEventListener("pointerdown",event=>startLinkDrag(event,b));
     });
-    if(q.mode==="link") drawLinkedLines();
+    if(q.mode==="link") { drawLinkedLines(); requestAnimationFrame(drawLinkedLines); }
     if(q.mode==="drag")attachDrag();
     if(q.mode==="memory") memoryTimer=setTimeout(()=>{const s=app.querySelector("#memory-symbol"),h=app.querySelector("#memory-hint"),o=app.querySelector("#memory-options");if(s)s.classList.add("memory-hidden");if(h)h.textContent="O que você viu?";if(o)o.hidden=false;playVoiceFile(q.responseAudio);},3500);
   }
@@ -238,8 +237,21 @@
   }
   let activeLinkDrag=null;
   function linkPoint(button,side,boardRect) {
-    const rect=button.getBoundingClientRect();
-    return {x:(side==="left"?rect.right:rect.left)-boardRect.left,y:rect.top+rect.height/2-boardRect.top};
+    const buttonRect=button.getBoundingClientRect();
+    // Use the visible letter/image bounds instead of the full, wide button.
+    // This keeps the connector attached to what the child actually sees.
+    let contentRect=button.querySelector(".illustration")?.getBoundingClientRect();
+    if(!contentRect||!contentRect.width||!contentRect.height){
+      const range=document.createRange();
+      range.selectNodeContents(button);
+      contentRect=range.getBoundingClientRect();
+    }
+    const bounds=contentRect&&contentRect.width?contentRect:buttonRect;
+    const edgeGap=4;
+    return {
+      x:(side==="left"?bounds.right+edgeGap:bounds.left-edgeGap)-boardRect.left,
+      y:bounds.top+bounds.height/2-boardRect.top
+    };
   }
   function drawLinkedLines(preview=null) {
     const board=app.querySelector("[data-link-board]"),svg=board?.querySelector(".link-lines");
@@ -301,6 +313,17 @@
     screen.classList.add("maze-blocked");
     mazeFeedbackTimer=setTimeout(()=>screen.classList.remove("maze-blocked"),1000);
     playMazeBlockedSound();
+  }
+  function revealTreasure(button) {
+    if(game.locked||button.disabled)return;
+    button.disabled=true;
+    button.classList.add("treasure-stone--vanishing");
+    playSound("tap");
+    setTimeout(()=>{
+      game.treasureRevealed=true;
+      renderGame();
+      setTimeout(()=>{if(app.querySelector(".treasure-scene"))submitAnswer("pedra");},1800);
+    },650);
   }
   function answerLabel(q) { if(game.followupActive&&q.followup)return q.followup.answer;if(q.mode==="syllables")return q.answer.replaceAll("-"," · ");if(q.mode==="word-parts")return q.answer.replaceAll("-"," + ");if(q.mode==="missing")return `${q.before}${q.answer}${q.after}`;if(q.mode==="compare")return q.answer==="left"?q.leftName:q.rightName;if(q.mode==="treasure")return q.answer;if(q.mode==="link")return "todos os pares corretos";if(q.mode==="maze")return "chegar à casa seguindo os quadrados marrons";return q.answer; }
   function feedbackDialog(q) {
