@@ -462,6 +462,13 @@ h1, h2, p { margin-top: 0; }
   }
 }
 
+/* Questões com três alternativas: três colunas reais, centralizadas. */
+.play-area--image-choice .identify-options.option-grid--images-only:has(> :nth-child(3):last-child) {
+  width: min(100%, 660px) !important;
+  margin-inline: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
 /* Último ajuste: quatro alternativas de imagem na mesma linha. */
 .play-area--image-choice .identify-options.option-grid--images-only {
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
